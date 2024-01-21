@@ -17,9 +17,9 @@ export class Line{
     connectionB: Point
     fillStyle: string | CanvasGradient | CanvasPattern
     textStyle: string | CanvasGradient | CanvasPattern
-    lineWidth = 10
+    lineWidth = 3
     drawingScale = 10
-    constructor(connectionA: Point, connectionB: Point,weight:number = 0,  fillStyle: string | CanvasGradient | CanvasPattern = "purple", textStyle: string | CanvasGradient | CanvasPattern = "lime" ){
+    constructor(connectionA: Point, connectionB: Point,weight:number = 0,  fillStyle: string | CanvasGradient | CanvasPattern = "purple", textStyle: string | CanvasGradient | CanvasPattern = "darkblue" ){
         if(weight === 0){
             this.weight = Math.floor(Math.sqrt((connectionA.x - connectionB.x)**2 + (connectionA.y - connectionB.y)**2)) / this.drawingScale
         }else{
@@ -39,9 +39,9 @@ export class Line{
         ctx.stroke(); 
 
         ctx.beginPath()
-        ctx.font = "40px serif";
+        ctx.font = "10px serif";
         ctx.strokeStyle = this.textStyle
-        ctx.lineWidth = 2
+        ctx.lineWidth = 1
         ctx.strokeText(String(this.weight), midPoint(this.connectionA.x, this.connectionB.x), midPoint(this.connectionA.y, this.connectionB.y))
         ctx.fill()
     }

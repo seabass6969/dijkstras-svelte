@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { onMount } from "svelte";
-	import { Graph } from "./lib/screen";
+	import { Graph} from "./lib/screen";
 	import { UserClickPOS } from "./lib/stores";
 	let canvas: HTMLCanvasElement;
-	let screen = Graph.default()
-	// let screen = new Graph([], [])
+	// let screen = Graph.default()
+	let screen = new Graph([], [])
 	onMount(() => {
 		const ctx = canvas.getContext("2d");
 		if (ctx != null) {
@@ -54,15 +54,30 @@
 		}
 	};
 	const reset = () => {
-		screen = Graph.default()
+		screen.Points = Graph.default().Points
+		screen.Lines = Graph.default().Lines
 	};
+	const save = () => {
+		localStorage.setItem("saves", screen.GraphConverter())
+	}
+	const remove = () => {
+		screen.popPoint(prompt("Remove which item: "))
+	}
+	const load = () => {
+		const localStoragecontent = localStorage.getItem("saves")
+		if(localStoragecontent != null ){
+			const ParsedContent = Graph.GraphParser(JSON.parse(localStoragecontent))
+			screen.Points = ParsedContent.Points
+			screen.Lines = ParsedContent.Lines
+		}
+	}
 </script>
 
 <canvas
 	id="canvas"
 	bind:this={canvas}
 	width="600"
-	height="600"
+	height="800"
 	on:mousedown={screen.screenDownListener}
 ></canvas>
 <div>
@@ -70,6 +85,10 @@
 	<button on:click={newLine}>New Line</button>
 	<button on:click={runAlgo}>RUN THE ALGORITHM</button>
 	<button on:click={reset}>reset</button>
+	<br>
+	<button on:click={save}>Save</button>
+	<button on:click={load}>Load</button>
+	<button on:click={remove}>Remove</button>
 	<br />
 	<span>status: {status}</span>
 </div>

@@ -1,7 +1,32 @@
+import { defaultSave } from "./Default"
 import { Line } from "./Line"
 import { Point } from "./Points"
 import { UserClickPOS } from "./stores"
 
+
+const JsonGraph: GraphJson = {
+    Points: [
+        { x: 300, y: 50, name: "A" },
+        { x: 300, y: 300, name: "B" },
+        { x: 100, y: 300, name: "C" },
+        { x: 500, y: 300, name: "D" },
+        { x: 300, y: 550, name: "E" },
+        { x: 500, y: 50, name: "F" },
+    ],
+    Lines: [
+        { connectionA: "A", connectionB: "B" },
+        { connectionA: "B", connectionB: "C" },
+        { connectionA: "B", connectionB: "C" },
+        { connectionA: "D", connectionB: "A" },
+        { connectionA: "B", connectionB: "E" },
+        { connectionA: "A", connectionB: "C" },
+        { connectionA: "B", connectionB: "D" },
+        { connectionA: "E", connectionB: "D" },
+        { connectionA: "C", connectionB: "E" },
+        { connectionA: "F", connectionB: "A" },
+        { connectionA: "D", connectionB: "F" },
+    ]
+}
 interface PointJson {
     x: number
     y: number
@@ -20,13 +45,23 @@ export class Graph {
     height: number
     Points: Point[]
     Lines: Line[]
-    constructor(Points: Point[], Lines: Line[], width: number = 600, height: number = 600) {
+    constructor(Points: Point[], Lines: Line[], width: number = 600, height: number = 800) {
         this.width = width
         this.height = height
         this.Lines = Lines
         this.Points = Points
     }
-    static GraphParser(json: GraphJson) {
+    GraphConverter() {
+        let out: GraphJson = {Points: [], Lines: []}
+        this.Points.forEach((v) => {
+            out.Points.push({x: v.x, y: v.y, name: v.name})
+        })
+        this.Lines.forEach((v) => {
+            out.Lines.push({connectionA: v.connectionA.name, connectionB: v.connectionB.name})
+        })
+        return JSON.stringify(out)
+    }
+    static GraphParser(json: GraphJson): Graph {
         let realPoints: Point[] = []
         json.Points.forEach(element => {
             realPoints.push(new Point(element.x, element.y, element.name))
@@ -42,34 +77,13 @@ export class Graph {
         return new Graph(realPoints, realLines)
     }
     static default() {
-        const JsonGraph: GraphJson = {
-            Points: [
-                { x: 300, y: 50, name: "A" },
-                { x: 300, y: 300, name: "B" },
-                { x: 100, y: 300, name: "C" },
-                { x: 500, y: 300, name: "D" },
-                { x: 300, y: 550, name: "E" },
-                { x: 500, y: 50, name: "F" },
-            ],
-            Lines: [
-                { connectionA: "A", connectionB: "B" },
-                { connectionA: "B", connectionB: "C" },
-                { connectionA: "B", connectionB: "C" },
-                { connectionA: "D", connectionB: "A" },
-                { connectionA: "B", connectionB: "E" },
-                { connectionA: "A", connectionB: "C" },
-                { connectionA: "B", connectionB: "D" },
-                { connectionA: "E", connectionB: "D" },
-                { connectionA: "C", connectionB: "E" },
-                { connectionA: "F", connectionB: "A" },
-                { connectionA: "D", connectionB: "F" },
-            ]
-        }
-        return this.GraphParser(JsonGraph)
+        // return this.GraphParser(JsonGraph)
+        return this.GraphParser(defaultSave)
     }
     draw(ctx: CanvasRenderingContext2D) {
-        ctx.fillStyle = "transparent";
-        ctx.fillRect(0, 0, this.width, this.height)
+        // ctx.fillStyle = "transparent";
+        // ctx.fillRect(0, 0, this.width, this.height)
+        this.pasteImage(ctx)
         this.Points.forEach(element => {
             element.ConnectedNode = []
             element.ViaLine = []
@@ -142,13 +156,16 @@ export class Graph {
         console.table(visitedNode)
         console.log("ending")
         let currentBacktrack: Point = PointEnd
+        let backtrackList: Point[] = [PointEnd]
         while (currentBacktrack != PointStart) {
             if (currentBacktrack.Previous != undefined) {
                 currentBacktrack.fillStyle = "green"
-                currentBacktrack = currentBacktrack.Previous
+                backtrackList.push(currentBacktrack)
                 if (currentBacktrack.usedLine != undefined) currentBacktrack.usedLine.fillStyle = "black"
+                currentBacktrack = currentBacktrack.Previous
             }
         }
+        console.log(backtrackList)
     }
     screenDownListener(e: MouseEvent) {
         const target = e.target
@@ -160,7 +177,9 @@ export class Graph {
         UserClickPOS.set({ x: x, y: y })
     }
     pushNewPoint(x: number, y: number, name: string) {
-        this.Points.push(new Point(x, y, name))
+        if(this.Points.findIndex(e => e.name == name) == -1){
+            this.Points.push(new Point(x, y, name))
+        }
     }
     pushNewLine(connectionA: string | null, connectionB: string | null) {
         const connectA = this.Points.find(value => value.name == connectionA)
@@ -168,5 +187,15 @@ export class Graph {
         if ((connectA != undefined) && (connectB != undefined)) {
             this.Lines.push(new Line(connectA, connectB))
         }
+    }
+    popPoint(name: string | null){
+        this.Points = this.Points.filter(e => e.name != name)
+    }
+    pasteImage(ctx: CanvasRenderingContext2D){
+        const img = new Image()
+        img.src = "https://static.vecteezy.com/system/resources/previews/020/919/370/original/united-kingdom-country-map-design-free-vector.jpg"
+        ctx.drawImage(img, 0, 0, this.width, this.height)
+    }
+    reset() {
     }
 }

@@ -3,7 +3,7 @@ import type { Line } from "./Line"
 export class Point{
     x:number
     y:number
-    radius:number = 30
+    radius:number = 13
     fillStyle: string | CanvasGradient | CanvasPattern
     textStyle: string | CanvasGradient | CanvasPattern
     name: string = "A"
@@ -14,7 +14,7 @@ export class Point{
     Previous: Point | undefined = undefined
     usedLine: Line | undefined = undefined
     ShortestDistance = 0
-    constructor(x: number, y: number,name: string,fillStyle: string | CanvasGradient | CanvasPattern = "red", textStyle: string | CanvasGradient | CanvasPattern = "orange" ){
+    constructor(x: number, y: number,name: string,fillStyle: string | CanvasGradient | CanvasPattern = "black", textStyle: string | CanvasGradient | CanvasPattern = "white" ){
         this.x = x
         this.y = y
         this.fillStyle = fillStyle
@@ -27,9 +27,9 @@ export class Point{
         ctx.fillStyle = this.fillStyle
         ctx.fill()
         ctx.beginPath()
-        ctx.font = "40px serif";
+        ctx.font = "8px serif";
         ctx.strokeStyle = this.textStyle
-        ctx.lineWidth = 2
+        ctx.lineWidth = 0.5
         ctx.strokeText(this.name, this.x - this.radius * 1/2, this.y + this.radius * 1/2)
         ctx.fill()
     }
