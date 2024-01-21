@@ -1,31 +1,10 @@
 <script lang="ts">
 	import { onMount } from "svelte";
 	import { Graph } from "./lib/screen";
-	import { Point } from "./lib/Points";
-	import { Line } from "./lib/Line";
 	import { UserClickPOS } from "./lib/stores";
 	let canvas: HTMLCanvasElement;
-	const PointA = new Point(300, 50, "A");
-	const PointB = new Point(300, 300, "B");
-	const PointC = new Point(100, 300, "C");
-	const PointD = new Point(500, 300, "D");
-	const PointE = new Point(300, 550, "E");
-	const PointF = new Point(500, 50, "F");
-	const LineA = new Line(PointA, PointB);
-	const LineB = new Line(PointB, PointC);
-	const LineC = new Line(PointD, PointA);
-	const LineE = new Line(PointB, PointE);
-	const LineF = new Line(PointA, PointC);
-	const LineG = new Line(PointB, PointD);
-	const LineH = new Line(PointE, PointD);
-	const LineI = new Line(PointC, PointE);
-	const LineJ = new Line(PointF, PointA);
-	const LineK = new Line(PointD, PointF);
-	const screen = new Graph(
-		[PointA, PointB, PointC, PointD, PointE, PointF],
-		[LineA, LineB, LineC, LineE, LineF, LineG, LineH, LineI, LineJ, LineK],
-	);
-
+	let screen = Graph.default()
+	// let screen = new Graph([], [])
 	onMount(() => {
 		const ctx = canvas.getContext("2d");
 		if (ctx != null) {
@@ -75,21 +54,7 @@
 		}
 	};
 	const reset = () => {
-		screen.setGraph(
-			[PointA, PointB, PointC, PointD, PointE, PointF],
-			[
-				LineA,
-				LineB,
-				LineC,
-				LineE,
-				LineF,
-				LineG,
-				LineH,
-				LineI,
-				LineJ,
-				LineK,
-			],
-		);
+		screen = Graph.default()
 	};
 </script>
 

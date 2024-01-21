@@ -12,6 +12,7 @@ export class Point{
     start = false
     end = false
     Previous: Point | undefined = undefined
+    usedLine: Line | undefined = undefined
     ShortestDistance = 0
     constructor(x: number, y: number,name: string,fillStyle: string | CanvasGradient | CanvasPattern = "red", textStyle: string | CanvasGradient | CanvasPattern = "orange" ){
         this.x = x
