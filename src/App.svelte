@@ -3,8 +3,8 @@
 	import { Graph} from "./lib/screen";
 	import { UserClickPOS } from "./lib/stores";
 	let canvas: HTMLCanvasElement;
-	// let screen = Graph.default()
-	let screen = new Graph([], [])
+	let screen = Graph.default()
+	// let screen = new Graph([], [])
 	onMount(() => {
 		const ctx = canvas.getContext("2d");
 		if (ctx != null) {
