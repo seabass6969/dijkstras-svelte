@@ -3,7 +3,7 @@ import type { Line } from "./Line"
 export class Point{
     x:number
     y:number
-    radius:number = 13
+    radius:number = 8
     fillStyle: string | CanvasGradient | CanvasPattern
     textStyle: string | CanvasGradient | CanvasPattern
     name: string = "A"
@@ -27,7 +27,7 @@ export class Point{
         ctx.fillStyle = this.fillStyle
         ctx.fill()
         ctx.beginPath()
-        ctx.font = "8px serif";
+        ctx.font = "7px serif";
         ctx.strokeStyle = this.textStyle
         ctx.lineWidth = 0.5
         ctx.strokeText(this.name, this.x - this.radius * 1/2, this.y + this.radius * 1/2)

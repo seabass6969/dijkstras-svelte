@@ -78,6 +78,7 @@ export class Graph {
     }
     static default() {
         // return this.GraphParser(JsonGraph)
+        console.log(defaultSave)
         return this.GraphParser(defaultSave)
     }
     draw(ctx: CanvasRenderingContext2D) {
@@ -166,6 +167,8 @@ export class Graph {
             }
         }
         console.log(backtrackList)
+        PointStart.fillStyle = "red"
+        PointEnd.fillStyle = "orange"
     }
     screenDownListener(e: MouseEvent) {
         const target = e.target

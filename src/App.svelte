@@ -91,6 +91,8 @@
 	<button on:click={remove}>Remove</button>
 	<br />
 	<span>status: {status}</span>
+	<br>
+	<span><span style="color: red">Red</span>: Start, <span style="color: green">Green</span>: along the route, <span style="color: orange">Orange</span>: destination</span>
 </div>
 
 <style>
