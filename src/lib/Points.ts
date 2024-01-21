@@ -14,6 +14,7 @@ export class Point{
     Previous: Point | undefined = undefined
     usedLine: Line | undefined = undefined
     ShortestDistance = 0
+    CombinedHeristic = 0
     constructor(x: number, y: number,name: string,fillStyle: string | CanvasGradient | CanvasPattern = "black", textStyle: string | CanvasGradient | CanvasPattern = "white" ){
         this.x = x
         this.y = y

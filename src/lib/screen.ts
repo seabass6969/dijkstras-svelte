@@ -3,30 +3,6 @@ import { Line } from "./Line"
 import { Point } from "./Points"
 import { UserClickPOS } from "./stores"
 
-
-const JsonGraph: GraphJson = {
-    Points: [
-        { x: 300, y: 50, name: "A" },
-        { x: 300, y: 300, name: "B" },
-        { x: 100, y: 300, name: "C" },
-        { x: 500, y: 300, name: "D" },
-        { x: 300, y: 550, name: "E" },
-        { x: 500, y: 50, name: "F" },
-    ],
-    Lines: [
-        { connectionA: "A", connectionB: "B" },
-        { connectionA: "B", connectionB: "C" },
-        { connectionA: "B", connectionB: "C" },
-        { connectionA: "D", connectionB: "A" },
-        { connectionA: "B", connectionB: "E" },
-        { connectionA: "A", connectionB: "C" },
-        { connectionA: "B", connectionB: "D" },
-        { connectionA: "E", connectionB: "D" },
-        { connectionA: "C", connectionB: "E" },
-        { connectionA: "F", connectionB: "A" },
-        { connectionA: "D", connectionB: "F" },
-    ]
-}
 interface PointJson {
     x: number
     y: number
@@ -85,17 +61,8 @@ export class Graph {
         // ctx.fillStyle = "transparent";
         // ctx.fillRect(0, 0, this.width, this.height)
         this.pasteImage(ctx)
-        this.Points.forEach(element => {
-            element.ConnectedNode = []
-            element.ViaLine = []
-        })
         this.Lines.forEach(element => {
             element.draw(ctx)
-            element.connectionA.ConnectedNode.push(element.connectionB)
-            element.connectionA.ViaLine.push(element)
-            element.connectionB.ConnectedNode.push(element.connectionA)
-            element.connectionB.ViaLine.push(element)
-
         });
         this.Points.forEach(element => {
             element.draw(ctx)
@@ -109,9 +76,93 @@ export class Graph {
         this.draw(ctx)
         requestAnimationFrame(() => this.update(ctx))
     }
-    algoStart(PointStart: Point, PointEnd: Point) {
+    resettingPointsANDLines(){
+        this.Points.forEach(element => {
+            element.ConnectedNode = []
+            element.ViaLine = []
+        })
+        this.Lines.forEach(element => {
+            element.connectionA.ConnectedNode.push(element.connectionB)
+            element.connectionA.ViaLine.push(element)
+            element.connectionB.ConnectedNode.push(element.connectionA)
+            element.connectionB.ViaLine.push(element)
+        });
+    }
+    algoStartAStar(PointStart: Point, PointEnd: Point) {
         let visitedNode = []
         let unvisitedNode: Point[] = []
+        this.resettingPointsANDLines()
+        unvisitedNode = this.Points
+        // reseting value
+        unvisitedNode.forEach((e) => {
+            e.start = false
+            e.end = false
+            e.Previous = undefined
+            if (e.name == PointStart.name) {
+                e.ShortestDistance = 0
+                e.CombinedHeristic = Math.floor(Math.sqrt((e.y - PointEnd.y) + (e.x - PointEnd.x))) // Pythagoras √(Δy + Δx)
+            } else {
+                e.ShortestDistance = Infinity
+                e.CombinedHeristic = Infinity
+            }
+        })
+        PointStart.start = true
+        PointEnd.end = true
+        PointStart.ConnectedNode.forEach((node, index) => {
+            node.ShortestDistance = PointStart.ViaLine[index].weight
+            node.CombinedHeristic = PointStart.ViaLine[index].weight + Math.floor(Math.sqrt((node.y - PointEnd.y) + (node.x - PointEnd.x)))
+            node.Previous = PointStart
+            node.usedLine = PointStart.ViaLine[index]
+        })
+        unvisitedNode = unvisitedNode.filter((value) => PointStart.name != value.name)
+        console.log(unvisitedNode)
+
+        // created 3 list unvisted, visited and DistanceTable
+        // starting the Calculation Progress
+        let currentLength = unvisitedNode.length
+        for (let index = 0; index < currentLength; index++) {
+            const ShortestMap = unvisitedNode.map((value) => value.CombinedHeristic)
+            const ShortestNode = unvisitedNode.find((e) => e.CombinedHeristic == Math.min(...ShortestMap))
+            // shortestNode
+            ShortestNode?.ConnectedNode.forEach((element, index) => {
+                const Line = ShortestNode.ViaLine[index]
+                if ((element.ShortestDistance > (element.ShortestDistance + Line.weight)) || (element.ShortestDistance == Infinity)) {
+                    if (element.ShortestDistance == Infinity) {
+                        element.ShortestDistance = Line.weight
+                        element.CombinedHeristic = Line.weight + Math.floor(Math.sqrt((element.y - PointEnd.y) + (element.x - PointEnd.x)))
+                    } else {
+                        element.ShortestDistance += Line.weight
+                        element.CombinedHeristic = element.ShortestDistance + Math.floor(Math.sqrt((element.y - PointEnd.y) + (element.x - PointEnd.x)))
+                    }
+                    element.Previous = ShortestNode
+                }
+            });
+            console.log(ShortestNode)
+            unvisitedNode = unvisitedNode.filter(value => value.name != ShortestNode?.name)
+            visitedNode.push(ShortestNode)
+        }
+        console.log("ending")
+        console.table(unvisitedNode)
+        console.table(visitedNode)
+        console.log("ending")
+        let currentBacktrack: Point = PointEnd
+        // let backtrackList: Point[] = [PointEnd]
+        while (currentBacktrack != PointStart) {
+            if (currentBacktrack.Previous != undefined) {
+                currentBacktrack.fillStyle = "green"
+                // backtrackList.push(currentBacktrack)
+                if (currentBacktrack.usedLine != undefined) currentBacktrack.usedLine.fillStyle = "black"
+                currentBacktrack = currentBacktrack.Previous
+            }
+        }
+        // console.log(backtrackList)
+        PointStart.fillStyle = "red"
+        PointEnd.fillStyle = "orange"
+    }
+    algoStartDijstras(PointStart: Point, PointEnd: Point) {
+        let visitedNode = []
+        let unvisitedNode: Point[] = []
+        this.resettingPointsANDLines()
         unvisitedNode = this.Points
         unvisitedNode.forEach((e) => {
             e.start = false

@@ -45,12 +45,18 @@
 		const connectB = screen.Points.find(
 			(value) => value.name == connectionB,
 		);
+		// const PromptAStarorDJ = prompt("Type A for A*, D for Dijstras")
+		const PromptAStarorDJ = "A"
 		if (
 			connectA != undefined &&
 			connectB != undefined &&
 			connectA != connectB
 		) {
-			screen.algoStart(connectA, connectB);
+			// if(PromptAStarorDJ == "D"){
+				screen.algoStartDijstras(connectA, connectB);
+			// }else if(PromptAStarorDJ == "A"){
+				// screen.algoStartAStar(connectA, connectB);
+			// }
 		}
 	};
 	const reset = () => {
